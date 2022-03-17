@@ -100,13 +100,42 @@ public class BinaryTree<T extends Comparable<T>> implements BinaryTreeADT<T> {
         while(!stack.isEmpty()){
             BinaryNode<T> actual = stack.dequeue();
             lista.add(actual.getElement());
-            if(actual.getLeft() != null)
+            if(actual.getLeft() != null){
                 stack.enqueue(actual.getLeft());
-            if(actual.getRight() != null)
+            }
+            if(actual.getRight() != null){
                 stack.enqueue(actual.getRight());
+            }
         }
         return lista.iterator();
     }
+    
+    public String printLevelOrder(){
+        int h = this.getHeight();
+        StringBuilder sb = new StringBuilder();
+        for(int i = 1; i <= h; i++){
+            printGivenLevel(root, i, sb);
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+    
+    private void printGivenLevel(BinaryNode<T> node, int level, StringBuilder sb){
+        if(node == null)
+            return;
+        if(level==1)
+            if(node.getDad() == null)
+                sb.append(node.getElement()).append(" ");
+            else
+                sb.append(node.getElement()).append(" (").append(node.getDad().getElement()).append(") ");
+            
+        if (level > 1){
+            printGivenLevel(node.getLeft(), level-1, sb);
+            printGivenLevel(node.getRight(), level-1, sb);
+        }
+    }
+    
+
     
     /**
      * Regresa true si encuentra un binary node que tenga como elemento el buscado.
@@ -183,9 +212,9 @@ public class BinaryTree<T extends Comparable<T>> implements BinaryTreeADT<T> {
                 actual = actual.getRight();
         }
         anterior.hang(nuevo);
+        //Aquí tenemos que ajustar los factores de equilibrio
+        
         cont++;
-        
-        
         
     }
     
@@ -237,7 +266,9 @@ public class BinaryTree<T extends Comparable<T>> implements BinaryTreeADT<T> {
                 nextInOrder.getDad().hang(nextInOrder.getRight());
             }
             cont--;
-        }        
+        } 
+        //Si cambia mi altura tengo que seguir revisando los nodos de arriba para ver si en ellos también cambia
+        
     }
     
     /**
@@ -266,6 +297,7 @@ public class BinaryTree<T extends Comparable<T>> implements BinaryTreeADT<T> {
     public int getHeight(){
         return getHeight(root, 0);
     }
+    
     
     //Se pueden contar usando el recorrido por niveles con el while y la pila
     private int getHeight(BinaryNode<T> tree, int cont){
@@ -304,12 +336,46 @@ public class BinaryTree<T extends Comparable<T>> implements BinaryTreeADT<T> {
         newTop.setDad(originalDad);                 //El papa de newTop es el que era el papa de alfa
     }
     
-    
-    
-    
-    
-    
-    
-    
-
+    private BinaryNode<T> rotate(BinaryNode<T> actual){
+        
+        
+        //Derecha-Izquierda
+        if(actual.eqFactor == 2 && actual.getRight().eqFactor == -1){
+            BinaryNode<T> alfa, papa, A, beta, gamma, D, B, C;
+            alfa = actual;
+            papa = actual.getDad();
+            A = alfa.getLeft();
+            beta = alfa.getRight();
+            gamma = beta.getLeft();
+            D = beta.getRight();
+            B = gamma.getLeft();
+            C = gamma.getRight();
+            if(A != null)
+                alfa.hang(A);
+            else
+                alfa.setLeft(null);
+            if(B != null)
+                alfa.hang(B);
+            else 
+                alfa.setRight(null);
+            if(C != null)
+                beta.hang(C);
+            else
+                beta.setLeft(null);
+            if(D != null)
+                beta.hang(D);
+            else
+                beta.setRight(null);
+            gamma.hang(alfa);
+            gamma.hang(beta);
+            papa.hang(gamma);
+            
+            //Falta actualizar factores de equilibrio
+            
+            //Tenemos que regresar a gamma para saber a partir de donde se va a continuar
+            return gamma;
+        }
+        return null;
+        
+    }
 }
