@@ -121,7 +121,7 @@ public class AVLTree<T extends Comparable<T>> {
             return;
         if(level == 1)
             if(node.getDad() == null){
-                sb.append(node.getElement()).append(' ').append("(null)").append(" (");
+                sb.append(node.getElement()).append(' ').append("(root)").append(" (");
                 sb.append(node.getEqFactor()).append(") ");
             } else {
                 sb.append(node.getElement()).append(" (").append(node.getDad().getElement()).append(")");
@@ -470,17 +470,11 @@ public class AVLTree<T extends Comparable<T>> {
         left = node.getLeft();
         right = node.getRight();
         if(right != null)
-            if(right.isLeaf())
-                rH = 1;
-            else
-                rH = right.getHeight();
+            rH = right.getHeight() + 1;
         else
             rH = 0;
         if(left != null)
-            if(left.isLeaf())
-                lH = 1;
-            else
-                lH = left.getHeight();
+            lH = left.getHeight() + 1;
         else
             lH = 0;
         node.setEqFactor(rH - lH);
