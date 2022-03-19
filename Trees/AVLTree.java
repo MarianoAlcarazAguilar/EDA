@@ -120,9 +120,10 @@ public class AVLTree<T extends Comparable<T>> {
         if(node == null)
             return;
         if(level == 1)
-            if(node.getDad() == null)
-                sb.append(node.getElement()).append(' ');
-            else{
+            if(node.getDad() == null){
+                sb.append(node.getElement()).append(' ').append("(null)").append(" (");
+                sb.append(node.getEqFactor()).append(") ");
+            } else {
                 sb.append(node.getElement()).append(" (").append(node.getDad().getElement()).append(")");
                 sb.append("(").append(node.getEqFactor()).append(")  "); 
             }   
@@ -186,6 +187,8 @@ public class AVLTree<T extends Comparable<T>> {
             if(dad.getLeft() != null){
                 if(dad.getLeft().equals(actual)){
                     dad.decreaseEF();
+                    if(dad.getEqFactor() == 0)
+                        break;
                     if(dad.getEqFactor()==2 || dad.getEqFactor() ==-2){
                         this.rotate(dad);
                         break;
@@ -195,6 +198,8 @@ public class AVLTree<T extends Comparable<T>> {
             if(dad.getRight() != null){
                 if(dad.getRight().equals(actual)){
                     dad.increaseEF();
+                    if(dad.getEqFactor() == 0)
+                        break;
                     if(dad.getEqFactor()==2 || dad.getEqFactor() ==-2){
                         this.rotate(dad);
                         break;
@@ -272,21 +277,153 @@ public class AVLTree<T extends Comparable<T>> {
         }  
     }
     
+    /**
+     * Este método rota los nodos de manera correcta dependiendo de los factores de equilibrio.  
+     * Regresa el nodo que sustituyó al actual, es decir, de donde se debe continuar.  
+     * Si regresa nulo significa que algo no salió bien y el nodo que se le mandó no estaba mal balanceado.
+     * TODO: Actualizar todos los factores de equilibrio tras las rotaciones.
+     * @param actual
+     * @return 
+     */
     public AVLNode<T> rotate(AVLNode<T> actual){
+        
         //Izquierda-Izquierda
-        
-        
+        if(actual.getEqFactor() == -2 && actual.getLeft().getEqFactor() == -1){
+            AVLNode<T> alfa, beta, gamma, A, B, C, D, dad;
+            alfa = actual;
+            beta = alfa.getLeft();
+            gamma = beta.getLeft();
+            A = gamma.getLeft();
+            B = gamma.getRight();
+            C = beta.getRight();
+            D = alfa.getRight();
+            dad = actual.getDad();
+            if(A != null)
+                gamma.hang(A);
+            else
+                gamma.setLeft(null);
+            if(B != null)
+                gamma.hang(B);
+            else
+                gamma.setRight(null);
+            if(C != null)
+                alfa.hang(C);
+            else
+                alfa.setLeft(null);
+            if(D != null)
+                alfa.hang(D);
+            else
+                alfa.setRight(null);
+            beta.hang(gamma);
+            beta.hang(alfa);
+            
+            if(dad != null)
+                dad.hang(beta);
+            else{
+                beta.setDad(null);
+                root = beta;
+            }
+            //TODO: Actualizar factores de equilibrio
+            
+            this.setNewEqFactor(alfa);
+            this.setNewEqFactor(gamma);
+            this.setNewEqFactor(beta);
+            
+            
+            return beta;
+        }
         //Derecha-Derecha
+        if(actual.getEqFactor() >= 2 && actual.getRight().getEqFactor() >= 0){
+            AVLNode<T> alfa, beta, gamma, A, B, C, D, dad;
+            alfa = actual;          
+            beta = alfa.getRight(); 
+            gamma = beta.getRight();
+            A = alfa.getLeft();  
+            B = beta.getLeft();  
+            C = gamma.getLeft(); 
+            D = gamma.getRight();
+            dad = actual.getDad();
+            if(A != null)
+                alfa.hang(A);
+            else
+                alfa.setLeft(null);
+            if(B != null)
+                alfa.hang(B);
+            else
+                alfa.setRight(null);
+            if(C != null)
+                gamma.hang(C);
+            else
+                gamma.setLeft(null);
+            if(D != null)
+                gamma.hang(D);
+            else
+                gamma.setRight(null);
+            beta.hang(alfa);
+            beta.hang(gamma);
+            if(dad != null)
+                dad.hang(beta);
+            else{
+                beta.setDad(null);
+                root = beta;
+            }    
+            //TODO: Actualizar factores de equilibrio
+            this.setNewEqFactor(alfa);
+            this.setNewEqFactor(gamma);
+            this.setNewEqFactor(beta);
+            
+            return beta;
+        }
         
         
         //Izquierda-Derecha
+        if(actual.getEqFactor() == -2 && actual.getLeft().getEqFactor() >= 0){
+            AVLNode<T> alfa, beta, gamma, A, B, C, D, dad;
+            alfa = actual;
+            beta = alfa.getLeft();
+            gamma = beta.getRight();
+            A = beta.getLeft();
+            B = gamma.getLeft();
+            C = gamma.getRight();
+            D = alfa.getRight();
+            dad = actual.getDad();
+            if(A != null)
+                beta.hang(A);
+            else
+                beta.setLeft(null);
+            if(B != null)
+                beta.hang(B);
+            else
+                beta.setRight(null);
+            if(C != null)
+                alfa.hang(C);
+            else
+                alfa.setLeft(null);
+            if(D != null)
+                alfa.hang(D);
+            else
+                alfa.setRight(null);
+            gamma.hang(beta);
+            gamma.hang(alfa);
+            if(dad != null)
+                dad.hang(gamma);
+            else{
+                gamma.setDad(null);
+                root = gamma;
+            }
+            //TODO: Actualizar factores de equilibrio
+            this.setNewEqFactor(alfa);
+            this.setNewEqFactor(gamma);
+            this.setNewEqFactor(beta);
+            return gamma;
+        }
         
         
         //Derecha-Izquierda
         if(actual.getEqFactor() == 2 && actual.getRight().getEqFactor() == -1){
-            AVLNode<T> alfa, papa, A, beta, gamma, D, B, C;
+            AVLNode<T> alfa, beta, gamma, A, B, C, D, dad;
             alfa = actual;
-            papa = actual.getDad();
+            dad = actual.getDad();
             A = alfa.getLeft();
             beta = alfa.getRight();
             gamma = beta.getLeft();
@@ -311,24 +448,43 @@ public class AVLTree<T extends Comparable<T>> {
                 beta.setRight(null);
             gamma.hang(alfa);
             gamma.hang(beta);
-            papa.hang(gamma);
-            
+            if(dad != null)
+                dad.hang(gamma);
+            else{
+                gamma.setDad(null);
+                root = gamma;
+            }
             //Falta actualizar factores de equilibrio
             
-            //Tenemos que regresar a gamma para saber a partir de donde se va a continuar
+            this.setNewEqFactor(gamma);
+            this.setNewEqFactor(gamma.getLeft());
+            this.setNewEqFactor(gamma.getRight());
             return gamma;
         }
         return null;
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
+    private void setNewEqFactor(AVLNode<T> node){
+        AVLNode<T> left, right;
+        int lH, rH;
+        left = node.getLeft();
+        right = node.getRight();
+        if(right != null)
+            if(right.isLeaf())
+                rH = 1;
+            else
+                rH = right.getHeight();
+        else
+            rH = 0;
+        if(left != null)
+            if(left.isLeaf())
+                lH = 1;
+            else
+                lH = left.getHeight();
+        else
+            lH = 0;
+        node.setEqFactor(rH - lH);
+    }
     
 
 }
