@@ -30,8 +30,9 @@ Para ello tenemos los siguientes pasos:
 Para ello tenemos los siguientes pasos:
 1. Intercambiamos la última posición del arreglo con la primera.
 
-
-- Buscar el mínimo
+#### Búsqueda
+**NOTA**: Solo podemos buscar el elemento más pequeño.
+1. Regresamos la posición 1 del arreglo.
 
 ### Implementación
 Una de las maneras más eficientes de lograr implementar esta estructura es mediante  
